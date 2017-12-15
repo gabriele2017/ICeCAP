@@ -1,0 +1,9 @@
+Hammock file of the fragments
+*****************************
+
+cat ALL_FRAGMENTS*> hindiii
+
+cat hindiii|sed 's/chr//'|sort -k1,1 -nk2,2|gawk '{print "chr"$1 "\t" $2 "\t" $3 "\t id:1,name=\"\""}'|sed 's/chr23/chrX/'|sed 's/chr24/chrY/'|sed 's/chr25/chrM/' > hindiii2
+
+/apps/well/bedtools/2.24.0-18-gb0bc5b7/bin/slopBed -i hindiii2 -g ../../../testATAC/ATAC_CTL5_100K_CD14_20min_last.pinechrom_general/ATAC_CTL5_100K_CD14_20min_last.chrom_sizes.txt -b 0 |gawk '{if($2<=$3){print }}' > fragments 
+
