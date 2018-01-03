@@ -33,6 +33,7 @@
 #define maxim(a,b)(((a)>(b)) ? (a) : (b))
 #define minim(a,b)(((a)<(b)) ? (a) : (b))
 
+
 double
 gsl_cdf_poisson_P (const unsigned int k, const double mu)
 {
@@ -150,7 +151,7 @@ int main(int argc, char *argv[])
       char *file,*file2,*file3,*file4,*filenorma,*filelogs,*fileref,*fileref2,*fileref3,*fileref4;
       char *lane,*folderN,*folder,*tmp,*folderref,*folderrefmap,*folderfrag,*folderrefC,*folderwrite,*BAITS,*BAITFLAG,*PATH,*PATH2;
       char *ALLELE,*PWEIGHT,*PATHBOWTIE,*verbose,*stats,*outprefix,*path;
-      char *outdir,*outdir2,*indir,*REFERENCE,*folder1,*TRANS;
+      char *outdir,*outdir2,*indir,*REFERENCE,*folder1,*fourCVIEW;
       char *fileoutput1,*fileoutput2,*fileoutput3,*fileoutput4;
 
       char QNAME[100],CIGAR[100],SEQ[100],QSEQ[100];
@@ -203,7 +204,7 @@ int main(int argc, char *argv[])
       trimming=(double)(0.001);
       chrom_start=1;
       chrom_end=22;
-      TRANS="no";
+      fourCVIEW="yes";
       REFERENCE="hg19";
 
       if(argc ==1){
@@ -222,7 +223,7 @@ int main(int argc, char *argv[])
         case 'D' :           folderwrite=optarg;            break;
         case 'h' :           print_usage();                 break;
         case 'V' :	     printf("%s\t%s\n",PACKAGE, VERSION);              exit(0);             break;
-        case 'v' :           TRANS=optarg;                  break;
+        case 'v' :           fourCVIEW=optarg;              break;
 	case 'S' :           stats=optarg;                  break;
         case 's' :           chrom_start=atoi(optarg);      break;
         case 'e' :           chrom_end=atoi(optarg);        break;
@@ -256,7 +257,7 @@ int main(int argc, char *argv[])
 
 sprintf(stamp,"");
 /*_HiCinC_%s_Grid_%d_Zoom_%d_Chrom_%d_%d",ENZYME,GRID,SCALE,chrom_start,chrom_end);*/
-sprintf(stamp2,"_%s_%d_%d",outprefix,chrom_start,chrom_end);
+sprintf(stamp2,"_%s_%d_%d_%dtest",outprefix,chrom_start,chrom_end,SCALE);
    
       if(strlen(folder)==0||dirExists(folder)==0){printf("\n\n Please provide mandatory -f field: \n\n Refer to the Manual.Thank you. \n\n "); exit(0);}
       sprintf(end,"%c\0",folder[strlen(folder)-1]);
@@ -418,7 +419,7 @@ system(command);
         printf("Statistics      : %s\n",stats);                 printf("CONFIG:           : %s\n",folderN);
         printf("READ LENGTH     : %d\n",TRIM);                  printf("ALLELE:           : %s\n",ALLELE);
         printf("NUMBER OF CORES : %d\n",corenodes);             printf("NGS OUTPUT        : %s\n",folderN);
-        printf("INTER-CHROMOSOME ANALYSIS     : %s\n",TRANS);
+        printf("Virtual 4C Maps : %s\n",fourCVIEW);
 
         printf("Input Sam : %s\n",indir);             printf("Output : %s\n",outdir);
         
@@ -444,7 +445,6 @@ totfragments[0]=0;
 if(strlen(folderN)!=0){fout3e = fopen(concat(fileref4,""),"w+");}
 
 for(chrom=chrom_start;chrom<=chrom_end;chrom++){
-
 digest(chrom,allchrom,rf,enzyme,ENZYME,CUT,SCALE,GRID,PATHBOWTIE,REFERENCE,resolution); nchromosomes++; tot+=(rf[chrom]-1);  totfragments[nchromosomes]=tot;
 if((rf[chrom]-1)>tot3){tot3=rf[chrom]-1; BIN=rint((enzyme[chrom][rf[chrom]-1])/(rf[chrom]-1)); }
 printf("Chromosomes analyzed: %d\tFragments on Chromosome %d: %d\t Total number of Fragments:%d\n",nchromosomes,chrom,rf[chrom],totfragments[nchromosomes]);
@@ -516,7 +516,7 @@ if(strlen(folderN)!=0){fclose(fout3e);}
       fprintf(fout3,"Statistics      : %s\n",stats);                 fprintf(fout3,"NGS step:         : %s\n",folderN);
       fprintf(fout3,"READ LENGTH     : %d\n",TRIM);                  fprintf(fout3,"ALLELE:           : %s\n",ALLELE);
       fprintf(fout3,"NUMBER OF CORES : %d\n",corenodes);             fprintf(fout3,"NGS OUTPUT        : %s\n",folderN);
-      fprintf(fout3,"INTER-CHROMOSOME ANALYSIS     : %s\n",TRANS);
+      fprintf(fout3,"INTER-CHROMOSOME ANALYSIS     : %s\n",fourCVIEW);
 
       fprintf(fout3,"Input Sam : %s\n",indir);             fprintf(fout3,"Output : %s\n",outdir);
 
@@ -762,7 +762,7 @@ weights(chrom_start,chrom_end,rf,enzyme,enriched,map_threshold,weight_threshold,
 weights(chrom_start,chrom_end,rf,enzyme,enriched,map_threshold,weight_threshold,totfragments,hico,map,weight2,tot,tot2,file2);
 
 conv_check=(double)(1.0); iter=0;
-filewrite(BIN,resolution,chrom_start,chrom_end,iter,rf,enzyme,enriched,totfragments,hico,hic,weight2,tot,tot2,tot3,avg,avg2,avg_norma,avg_norma2,trimming,stats,TRANS,PVAL,FDR,fileoutput1,fileoutput2,filenorma,folderref,folderrefC);
+filewrite(BIN,resolution,chrom_start,chrom_end,iter,rf,enzyme,enriched,totfragments,hico,hic,weight2,tot,tot2,tot3,avg,avg2,avg_norma,avg_norma2,trimming,stats,fourCVIEW,PVAL,FDR,fileoutput1,fileoutput2,filenorma,folderref,folderrefC);
 
 while(conv_check>tolerance&&iter<max_iter){
 iter++; 
@@ -790,7 +790,7 @@ fprintf(fout3,"%d\t\t\t%lf\t\t\t%lf\n",iter,conv_check,tolerance);
 printf("%d\t%lf\t%lf\n",iter,conv_check,tolerance); 
 }
 
-filewrite(BIN,resolution,chrom_start,chrom_end,iter,rf,enzyme,enriched,totfragments,hico,hic,weight2,tot,tot2,tot3,avg,avg2,avg_norma,avg_norma2,trimming,stats,TRANS,PVAL,FDR,fileoutput1,fileoutput2,file4,folderref,folderrefC);
+filewrite(BIN,resolution,chrom_start,chrom_end,iter,rf,enzyme,enriched,totfragments,hico,hic,weight2,tot,tot2,tot3,avg,avg2,avg_norma,avg_norma2,trimming,stats,fourCVIEW,PVAL,FDR,fileoutput1,fileoutput2,file4,folderref,folderrefC);
 
 if(strlen(folderN)==0){
 
@@ -829,28 +829,28 @@ sprintf(command,"%s/%s/%s_domain_caller.sh",folder,lane,lane);
 exit(0);
 }
 
-filewrite(BIN,resolution,chrom_start,chrom_end,iteration,rf,enzyme,enriched,totfragments,hico,hic,weight2,tot,tot2,tot3,avg,avg2,avg_norma,avg_norma2,trimming,stats,TRANS,PVAL,FDR,fileout1,fileout2,fileout3,folderref,folderrefC)
-int BIN; int resolution;int chrom_start;int chrom_end; int iteration;  int rf[CHROMOSOMES];int **enzyme; int **enriched;  int *totfragments; double **hico; double **hic; double *weight2; int tot; int tot2; int tot3; int *avg_norma;int *avg_norma2; double *avg;double *avg2; double trimming; char *stats; char *TRANS; double PVAL; double FDR;char *fileout1;char *fileout2;char *fileout3; char *folderref; char *folderrefC;
+filewrite(BIN,resolution,chrom_start,chrom_end,iteration,rf,enzyme,enriched,totfragments,hico,hic,weight2,tot,tot2,tot3,avg,avg2,avg_norma,avg_norma2,trimming,stats,fourCVIEW,PVAL,FDR,fileout1,fileout2,fileout3,folderref,folderrefC)
+int BIN; int resolution;int chrom_start;int chrom_end; int iteration;  int rf[CHROMOSOMES];int **enzyme; int **enriched;  int *totfragments; double **hico; double **hic; double *weight2; int tot; int tot2; int tot3; int *avg_norma;int *avg_norma2; double *avg;double *avg2; double trimming; char *stats; char *fourCVIEW; double PVAL; double FDR;char *fileout1;char *fileout2;char *fileout3; char *folderref; char *folderrefC;
 {
 
 char itera[100];
 sprintf(itera,"%d",iteration);
 
-int chrom,chrom1,chrom2,x1,x2,y1,y2,tmp3,distanceint,bin_hf,bin_vf,bin_donut;
+int chrom,chrom1,chrom2,x1,x2,y1,y2,tmp3,distanceint,bin_hf,bin_vf,bin_donut,bin_qdonut;
 int i,j,ii,jj,k,kk,lg,idx,idx1,idx2,idx3,bin,allbin,max,allnonzerobin;
-int position,position_near,position2,down,up,su,giu,total,counter,avg_size,W,P;
-int flag,flag1,flag2;
+int position,position_near,position2,down,up,su,giu,total,counter,avg_size,W,WW,P;
+int flag,flag1,flag2,dum,qdum;
 int threshold[45],threshold1[45],threshold2[45];
 
 char viewpoint[100];
- char chromosome[5],schrom[5];
+char chromosome[5],schrom[5];
 float histobs[45][1000],histobs1[45][1000],histobs2[45][1000];
 float cumhist[45][1000],cumhist1[45][1000],cumhist2[45][1000];
 float normahist[45],normahist1[45],normahist2[45];
-float obs,corrected,expected,pval_donut,pval_hf,pval_vf,fdr,fdr1,fdr2;
-float average1,average2,average3,cover;
-double tmpo,tmp,tmp1,tmp2,KJ,DONUT,EDONUT,HOLE,EHOLE,VFILT,EVFILT,HFILT,EHFILT,RATIO,RATIO1,RATIO2,PR,PR1,PR2;
-
+float obs,corrected,expected,pval_donut,pval_hf,pval_vf,pval_qdonut,fdr,fdr1,fdr2;
+float average1,average2,average3,average4,cover;
+double tmpo,tmp,tmp1,tmp2,KJ,DONUT,EDONUT,QDONUT,EQDONUT,HOLE,EHOLE,VFILT,EVFILT,HFILT,EHFILT,RATIO,RATIO1,RATIO2,RATIO3,PR,PR1,PR2,PR3,donutmap;
+FILE *fout,*fout2b,*fout3b;
 bin=0;su=0;giu=0;
 total=0;
 
@@ -884,10 +884,11 @@ avg_norma[bin]++;
 }else{avg_norma2[bin]++;}
 }
 }
+
 su=0;giu=0;
 
 for(k=0;k<tot3-1;k++){
-counter=avg_norma[k]+1;
+counter=avg_norma[k];
 tmp=avg[k];
 
 su=0;giu=0; max=0;
@@ -908,9 +909,7 @@ if(tmp/counter>1.0){avg2[k]=tmp/counter;}else{avg2[k]=1.;}
 
 if(avg2[k]<=1.0){avg2[k]=1;}
 
-
-total=0;
-
+ total=0;
 FILE *fout2 = fopen (fileout3, "w");
 if(fout2==NULL){printf("normalization file cannot be opened or folder is missing\n"); exit(0);}
 
@@ -918,7 +917,9 @@ for(i=0;i<tot3-1;i++){
  fprintf(fout2,"%d\t%lf\t%lf\t%d\t%d\n",i*BIN,avg2[i],avg[i],avg_norma[i],avg_norma2[i]);}
 fclose(fout2);
 /*************************************************/
-  W=6;P=2;
+W=5;P=2;
+FILE *fouthic = fopen (concat(concat(fileout1,"hic."),"juicetools"), "w+");
+
   for(i=1;i<tot2; i++){
 
   if(iteration==0){  sprintf(viewpoint,"frag_%d_%d_%d_%d_%d.in",i,store2[i],store2b[i],store[i],enzyme[store2[i]][grid(store2[i],store[i]+1,rf,enzyme)+1]); }
@@ -927,126 +928,177 @@ fclose(fout2);
  sprintf(chromosome,"%d",store2[i]);
  sprintf(itera,"%d",iteration);
 
- FILE *fout = fopen (concat(concat(fileout1,"cis/"),viewpoint), "w+");
- FILE *fout2b = fopen (concat(concat(fileout1,"self/"),viewpoint), "w+");
- FILE *fout3b = fopen (concat(concat(fileout1,"trans/"),viewpoint), "w+");
- FILE *fout4 = fopen (concat(concat(concat(concat(concat(fileout2,"/self.donuts_it_"),itera),"_chr_"),chromosome),""), "a+");
- FILE *fout4b = fopen (concat(concat(concat(concat(concat(fileout2,"/cis.donuts_it_"),itera),"_chr_"),chromosome),""), "a+");
+FILE *fout = fopen (concat(concat(fileout1,"cis/"),viewpoint), "w+");
+FILE *fout2b = fopen (concat(concat(fileout1,"self/"),viewpoint), "w+");
+FILE *fout3b = fopen (concat(concat(fileout1,"trans/"),viewpoint), "w+");
 
- if(fout==NULL||fout2b==NULL||fout3b==NULL||fout4==NULL||fout4b==NULL){printf("frags/donuts file are empty or missing\n"); exit(0);}
+ if(fout==NULL||fout2b==NULL||fout3b==NULL){printf("frags/donuts file are empty or missing\n"); exit(0);}
+
+FILE *fout4 = fopen (concat(concat(concat(concat(concat(fileout2,"/self.donuts_it_"),itera),"_chr_"),chromosome),""), "a+");
+FILE *fout4b = fopen (concat(concat(concat(concat(concat(fileout2,"/cis.donuts_it_"),itera),"_chr_"),chromosome),""), "a+");
+  
  for(chrom=chrom_start;chrom<=chrom_end;chrom++){
 
  allbin=0; allnonzerobin=0;
- if(store2[i]==chrom){
+ if(store2[i]==chrom&&weight2[totfragments[store2[i]-chrom_start]+grid(store2[i],store[i]+1,rf,enzyme)]>0){
 
  for(j=totfragments[chrom-chrom_start]+1;j<totfragments[chrom-chrom_start+1];j++){
  allbin++; if(hic[i][j]!=0){allnonzerobin++;}}
 
- for(j=totfragments[chrom-chrom_start]+1;j<totfragments[chrom-chrom_start+1];j++){
-   KJ=0;DONUT=0;EDONUT=0; HOLE=0; EHOLE=0; VFILT=0; EVFILT=0; HFILT=0; EHFILT=0; RATIO=0; RATIO1=0;RATIO2=0; PR=0;PR1=0;PR2=0;
+for(j=totfragments[chrom-chrom_start]+1;j<totfragments[chrom-chrom_start+1];j++){
 
-for(jj=j+P;jj<=j+W;jj++){
-if((weight2[jj]*weight2[totfragments[store2[i]-chrom_start]+grid(store2[i],store[i]+1,rf,enzyme)])>0){
-VFILT+=hic[i][jj];
-lg=rint(fabs((double)(store[i]-enzyme[chrom][jj-totfragments[chrom-chrom_start]]))/BIN);
-EVFILT+=avg2[lg];
-}}
+KJ=0;DONUT=0;EDONUT=0; QDONUT=0;EQDONUT=0;HOLE=0; EHOLE=0; VFILT=0; EVFILT=0; HFILT=0; EHFILT=0; RATIO=0; RATIO1=0;RATIO2=0; RATIO3=0; PR=0;PR1=0;PR2=0; PR3=0;
 
-for(jj=j-P;jj<=j-W;jj++){
-if((weight2[jj]*weight2[totfragments[store2[i]-chrom_start]+grid(store2[i],store[i]+1,rf,enzyme)])>0){
-VFILT+=hic[i][jj];
-lg=rint(fabs((double)(store[i]-enzyme[chrom][jj-totfragments[chrom-chrom_start]]))/BIN);
-EVFILT+=avg2[lg];
-}}
+for(WW=W;WW<=20;WW++){
 
-if(iteration!=0&&hico[i][j]!=0){KJ=hico[i][j]/hic[i][j];}
-if(iteration==0){KJ=1;}
-if(EVFILT!=0){RATIO=KJ*(VFILT)/(EVFILT);}else{RATIO=0;}
-
-if((store2[i-W]==chrom&&store2[i+W]==chrom)&&(j+W<totfragments[chrom-chrom_start+1])&&(j-W >totfragments[chrom-chrom_start-1])){
-
-for(ii=i-W;ii<=i+W;ii++){
-for(jj=j-W;jj<=j+W;jj++){
-if((weight2[jj]*weight2[totfragments[store2[ii]-chrom_start]+grid(store2[ii],store[ii]+1,rf,enzyme)])>0){
-DONUT+=hic[ii][jj];
+tmp=0;
+donutmap=1;
+if((store2[i-WW]==chrom&&store2[i+WW]==chrom)&&(j+WW<totfragments[chrom-chrom_start+1])&&(j-WW >totfragments[chrom-chrom_start-1])){
+for(ii=i-WW;ii<=i+WW;ii++){
+for(jj=j-WW;jj<=j+WW;jj++){
+donutmap*=weight2[jj]*weight2[totfragments[store2[ii]-chrom_start]+grid(store2[ii],store[ii]+1,rf,enzyme)];
+tmp+=hic[ii][jj];
+dum++;
 lg=rint(fabs((double)(store[ii]-enzyme[chrom][jj-totfragments[chrom-chrom_start]]))/BIN);
-EDONUT+=avg2[lg];
-}}}
 
+}}
+if(tmp>16&&donutmap!=0){
+
+dum=0;
+for(jj=j+P;jj<=j+WW;jj++){
+dum++;
+VFILT+=hic[i][jj];
+lg=rint(fabs((double)(store[i]-enzyme[chrom][jj-totfragments[chrom-chrom_start]]))/BIN);
+EVFILT+=avg2[lg];
+}
+
+for(jj=j-P;jj<=j-WW;jj++){
+dum++;
+VFILT+=hic[i][jj];
+lg=rint(fabs((double)(store[i]-enzyme[chrom][jj-totfragments[chrom-chrom_start]]))/BIN);
+EVFILT+=avg2[lg];
+}
+
+
+if(dum!=0){VFILT/=dum;
+EVFILT/=dum;}
+
+dum=0;
+qdum=0;
+for(ii=i-WW;ii<=i+WW;ii++){
+for(jj=j-WW;jj<=j+WW;jj++){
+DONUT+=hic[ii][jj];
+dum++;
+lg=rint(fabs((double)(store[ii]-enzyme[chrom][jj-totfragments[chrom-chrom_start]]))/BIN);
+if(ii-i<0&&jj-j<0){
+qdum++;
+QDONUT+=hic[ii][jj];
+EQDONUT+=avg2[lg];
+}
+EDONUT+=avg2[lg];
+}}
+ 
 for(ii=i-P;ii<=i+P;ii++){
 for(jj=j-P;jj<=j+P;jj++){
-if((weight2[jj]*weight2[totfragments[store2[ii]-chrom_start]+grid(store2[ii],store[ii]+1,rf,enzyme)])>0){
-HOLE+=hic[ii][jj];
+dum--;
+DONUT-=hic[ii][jj];
 lg=rint(fabs((double)(store[ii]-enzyme[chrom][jj-totfragments[chrom-chrom_start]]))/BIN);
-EHOLE+=avg2[lg];
+if(ii-i<0&&jj-j<0){
+qdum--;
+QDONUT-=hic[ii][jj];
+EQDONUT-=avg2[lg];
 }
-}
-}
+EDONUT-=avg2[lg];
 
-for(ii=i+P;ii<=i+W;ii++){
-if((weight2[j]*weight2[totfragments[store2[ii]-chrom_start]+grid(store2[ii],store[ii]+1,rf,enzyme)])>0){
-HFILT=hic[ii][j];
+}
+}
+ 
+if(dum!=0){DONUT/=dum;
+EDONUT/=dum;}
+
+if(qdum!=0){QDONUT/=qdum;
+EQDONUT/=qdum;}
+
+dum=0;
+for(ii=i+P;ii<=i+WW;ii++){
+HFILT+=hic[ii][j];
+dum++;
 lg=rint(fabs((double)(store[ii]-enzyme[chrom][j-totfragments[chrom-chrom_start]]))/BIN);
 EHFILT+=avg2[lg];
-}}
-
-for(ii=i-P;ii<=i-W;ii++){
-if((weight2[j]*weight2[totfragments[store2[ii]-chrom_start]+grid(store2[ii],store[ii]+1,rf,enzyme)])>0){
+}
+ 
+for(ii=i-P;ii<=i-WW;ii++){
+dum++;
 HFILT+=hic[ii][j];
 lg=rint(fabs((double)(store[ii]-enzyme[chrom][j-totfragments[chrom-chrom_start]]))/BIN);
 EHFILT+=avg2[lg];
- }}
- if(EDONUT!=0&&EHOLE!=0){RATIO1=KJ*(DONUT-HOLE)/(EDONUT-EHOLE);}else{RATIO1=0;}
- if(EHFILT!=0){RATIO2=KJ*(HFILT)/(EHFILT);}else{RATIO2=0;}
+}
+
+if(dum!=0){EHFILT/=dum;
+HFILT/=dum;}
+
+lg=rint(fabs((double)(store[i]-enzyme[chrom][j-totfragments[chrom-chrom_start]]))/BIN);
+
+if(iteration!=0&&hico[i][j]!=0){KJ=hico[i][j]/hic[i][j];}
+if(iteration==0){KJ=1;}
+ if(EVFILT!=0){RATIO=KJ*(VFILT)/(EVFILT);PR=gsl_cdf_poisson_Q ((int)(hico[i][j]),avg2[lg]*RATIO);}else{PR=1.0;RATIO=0.1/avg2[lg];}
+ if(EDONUT!=0){RATIO1=KJ*(DONUT)/(EDONUT); PR1=gsl_cdf_poisson_Q ((int)(hico[i][j]),avg2[lg]*RATIO1);}else{PR1=1.0;RATIO1=0.1/avg2[lg];}
+ if(EHFILT!=0){RATIO2=KJ*(HFILT)/(EHFILT); PR2=gsl_cdf_poisson_Q ((int)(hico[i][j]),avg2[lg]*RATIO2);}else{PR2=1.0;RATIO2=0.1/avg2[lg];}
+ if(EQDONUT!=0){RATIO3=KJ*(QDONUT)/(EQDONUT); PR3=gsl_cdf_poisson_Q ((int)(hico[i][j]),avg2[lg]*RATIO3);}else{PR3=1.0;RATIO3=0.1/avg2[lg];}
+
+break;}
+
+ }
  }
 
- lg=rint(fabs((double)(store[i]-enzyme[chrom][j-totfragments[chrom-chrom_start]]))/BIN);
+ if(enriched[chrom][j-totfragments[chrom-chrom_start]]==0){
 
-PR=gsl_cdf_poisson_Q (hico[i][j],avg2[lg]*RATIO);
-PR1=gsl_cdf_poisson_Q (hico[i][j],avg2[lg]*RATIO1);
-PR2=gsl_cdf_poisson_Q (hico[i][j],avg2[lg]*RATIO2);
+   fprintf(fout,"%d\t%d\t%d\t%d\t%f\t%f\t%d\t%f\t%d\t%d\t%d\t%d\t%f\t%e\t%e\t%e\t%e\t%d\n",store2[i],store[i],chrom,enzyme[chrom][j-totfragments[chrom-chrom_start]],hico[i][j],hic[i][j],lg,avg2[lg],(int)(3*log(avg2[lg]*RATIO)/log(2.0)),(int)(3*log(avg2[lg]*RATIO1)/log(2.0)),(int)(3*log(avg2[lg]*RATIO2)/log(2.0)),(int)(3*log(avg2[lg]*RATIO3)/log(2.0)),(double)(allnonzerobin)/allbin,PR,PR1,PR2,PR3,WW);
 
-               if(enriched[chrom][j-totfragments[chrom-chrom_start]]==0){
-		 fprintf(fout,"%d\t%d\t%d\t%d\t%f\t%f\t%d\t%f\t%d\t%d\t%d\t%f\t%f\t%f\t%f\t%e\t%e\t%e\n",store2[i],store[i],chrom,enzyme[chrom][j-totfragments[chrom-chrom_start]],hico[i][j],hic[i][j],lg,avg2[lg],(int)(3*log(avg2[lg]*RATIO)/log(2.0)),(int)(3*log(avg2[lg]*RATIO1)/log(2.0)),(int)(3*log(avg2[lg]*RATIO2)/log(2.0)),avg2[lg]*RATIO,avg2[lg]*RATIO1,avg2[lg]*RATIO2,(double)(allnonzerobin)/allbin,PR,PR1,PR2);
+fprintf(fouthic,"0 %d %d %d 1 %d %d 1 %f\n",store2[i],store[i],(int)(store[i]/BIN),chrom,enzyme[chrom][j-totfragments[chrom-chrom_start]],hic[i][j]);
 
-               if(allbin!=0&&(double)(allnonzerobin)/allbin>trimming&&PR1<PVAL&&PR1>0&&PR2<PVAL&&PR2>0&&PR<PVAL&&PR>0&&lg>0&&(weight2[j]*weight2[totfragments[store2[i]-chrom_start]+grid(store2[i],store[i]+1,rf,enzyme)])>0){
-                 fprintf(fout4b,"%d\t%d\t%d\t%d\t%d\t%d\t%f\t%f\t%d\t%f\t%d\t%d\t%d\t%f\t%f\t%f\t%f\t%e\t%e\t%e\n",store2[i],store[i],enzyme[store2[i]][grid(store2[i],store[i]+1,rf,enzyme)+1],chrom,enzyme[chrom][j-totfragments[chrom-chrom_start]],enzyme[chrom][j-totfragments[chrom-chrom_start]+1],hic[i][j],hico[i][j],lg,avg2[lg],(int)(3*log(avg2[lg])/log(2.0)),(int)(3*log(avg2[lg])/log(2.0)),(int)(3*log(avg2[lg])/log(2.0)),avg2[lg]*RATIO,avg2[lg]*RATIO1,avg2[lg]*RATIO2,(double)(allnonzerobin)/allbin,PR,PR1,PR2);
-                }
-	       }
+ if(donutmap!=0&&allbin!=0&&(double)(allnonzerobin)/allbin>trimming&&PR1<PVAL&&PR1>0&&PR2<PVAL&&PR2>0&&PR3<PVAL&&PR3>0&&PR<PVAL&&PR>0&&lg>0&&(weight2[j]*weight2[totfragments[store2[i]-chrom_start]+grid(store2[i],store[i]+1,rf,enzyme)])>0){
+                 fprintf(fout4b,"chr%d\t%d\t%d\tchr%d\t%d\t%d\t%f\t%f\t%d\t%f\t%d\t%d\t%d\t%d\t%f\t%f\t%f\t%f\t%f\t%e\t%e\t%e\t%e\n",store2[i],store[i],enzyme[store2[i]][grid(store2[i],store[i]+1,rf,enzyme)+1],chrom,enzyme[chrom][j-totfragments[chrom-chrom_start]],enzyme[chrom][j-totfragments[chrom-chrom_start]+1],hic[i][j],hico[i][j],lg,avg2[lg],(int)(3*log(avg2[lg]*RATIO)/log(2.0)),(int)(3*log(avg2[lg]*RATIO1)/log(2.0)),(int)(3*log(avg2[lg]*RATIO2)/log(2.0)),(int)(3*log(avg2[lg]*RATIO3)/log(2.0)),avg2[lg]*RATIO,avg2[lg]*RATIO1,avg2[lg]*RATIO2,avg2[lg]*RATIO3,(double)(allnonzerobin)/allbin,PR,PR1,PR2,PR3);
+	    }
+ }
+ 
+if(enriched[chrom][j-totfragments[chrom-chrom_start]]!=0){
+  fprintf(fout2b,"%d\t%d\t%d\t%d\t%f\t%f\t%d\t%f\t%d\t%d\t%d\t%d\t%f\t%e\t%e\t%e\t%e\t%d\n",store2[i],store[i],chrom,enzyme[chrom][j-totfragments[chrom-chrom_start]],hico[i][j],hic[i][j],lg,avg2[lg],(int)(3*log(avg2[lg]*RATIO)/log(2.0)),(int)(3*log(avg2[lg]*RATIO1)/log(2.0)),(int)(3*log(avg2[lg]*RATIO2)/log(2.0)),(int)(3*log(avg2[lg]*RATIO3)/log(2.0)),(double)(allnonzerobin)/allbin,PR,PR1,PR2,PR3,WW);
 
-               if(enriched[chrom][j-totfragments[chrom-chrom_start]]!=0){
-                 fprintf(fout2b,"%d\t%d\t%d\t%d\t%f\t%f\t%d\t%f\t%d\t%d\t%d\t%f\t%f\t%f\t%f\t%e\t%e\t%e\n",store2[i],store[i],chrom,enzyme[chrom][j-totfragments[chrom-chrom_start]],hico[i][j],hic[i][j],lg,avg2[lg],(int)(3*log(avg2[lg]*RATIO)/log(2.0)),(int)(3*log(avg2[lg]*RATIO1)/log(2.0)),(int)(3*log(avg2[lg]*RATIO2)/log(2.0)),avg2[lg]*RATIO,avg2[lg]*RATIO1,avg2[lg]*RATIO2,(double)(allnonzerobin)/allbin,PR,PR1,PR2);
+fprintf(fouthic,"0 %d %d %d 1 %d %d 1 %f\n",store2[i],store[i],(int)(store[i]/BIN),chrom,enzyme[chrom][j-totfragments[chrom-chrom_start]],hic[i][j]);
 
-               if(allbin!=0&&(double)(allnonzerobin)/allbin>trimming&&PR1<PVAL&&PR1>0&&PR2<PVAL&&PR2>0&&PR<PVAL&&PR>0&&lg>0&&(weight2[j]*weight2[totfragments[store2[i]-chrom_start]+grid(store2[i],store[i]+1,rf,enzyme)])>0){
-               fprintf(fout4,"%d\t%d\t%d\t%d\t%d\t%d\t%f\t%f\t%d\t%f\t%d\t%d\t%d\t%f\t%f\t%f\t%f\t%e\t%e\t%e\n",store2[i],store[i],enzyme[store2[i]][grid(store2[i],store[i]+1,rf,enzyme)+1],chrom,enzyme[chrom][j-totfragments[chrom-chrom_start]],enzyme[chrom][j-totfragments[chrom-chrom_start]+1],hic[i][j],hico[i][j],lg,avg2[lg],(int)(3*log(avg2[lg])/log(2.0)),(int)(3*log(avg2[lg])/log(2.0)),(int)(3*log(avg2[lg])/log(2.0)),avg2[lg]*RATIO,avg2[lg]*RATIO1,avg2[lg]*RATIO2,(double)(allnonzerobin)/allbin,PR,PR1,PR2);
-	       }
-
+ if(donutmap!=0&&allbin!=0&&(double)(allnonzerobin)/allbin>trimming&&PR1<PVAL&&PR1>0&&PR2<PVAL&&PR2>0&&PR3<PVAL&&PR3>0&&PR<PVAL&&PR>0&&lg>0&&(weight2[j]*weight2[totfragments[store2[i]-chrom_start]+grid(store2[i],store[i]+1,rf,enzyme)])>0){
+               fprintf(fout4,"chr%d\t%d\t%d\tchr%d\t%d\t%d\t%f\t%f\t%d\t%f\t%d\t%d\t%d\t%d\t%f\t%f\t%f\t%f\t%f\t%e\t%e\t%e\t%e\n",store2[i],store[i],enzyme[store2[i]][grid(store2[i],store[i]+1,rf,enzyme)+1],chrom,enzyme[chrom][j-totfragments[chrom-chrom_start]],enzyme[chrom][j-totfragments[chrom-chrom_start]+1],hic[i][j],hico[i][j],lg,avg2[lg],(int)(3*log(avg2[lg]*RATIO)/log(2.0)),(int)(3*log(avg2[lg]*RATIO1)/log(2.0)),(int)(3*log(avg2[lg]*RATIO2)/log(2.0)),(int)(3*log(avg2[lg]*RATIO3)/log(2.0)),avg2[lg]*RATIO,avg2[lg]*RATIO1,avg2[lg]*RATIO2,avg2[lg]*RATIO3,(double)(allnonzerobin)/allbin,PR,PR1,PR2,PR3);
+	   }
+	       
 idx=(int)(3*log(avg2[lg]*RATIO)/log(2.0));
 idx1=(int)(3*log(avg2[lg]*RATIO1)/log(2.0));
 idx2=(int)(3*log(avg2[lg]*RATIO2)/log(2.0));
 idx3=(int)(hico[i][j]);
-if(idx>=0&&idx<40&&idx1>=0&&idx1<40&&idx2>=0&&idx2<40&&idx3<1000){
+
+               if(idx>=0&&idx<40&&idx1>=0&&idx1<40&&idx2>=0&&idx2<40&&idx3<1000){
 
                histobs[idx][idx3]++;
 	       histobs1[idx1][idx3]++;
 	       histobs2[idx2][idx3]++;
-}
+	       }
 	       }}}else{	      
 for(j=totfragments[chrom-chrom_start]+1;j<totfragments[chrom-chrom_start+1];j++){
-if(strcasecmp(TRANS,"no")!=0){fprintf(fout3b,"%d\t%d\t%d\t%d\t%f\n",store2[i],enzyme[store2[i]][grid(store2[i],store[i]+1,rf,enzyme)],chrom,enzyme[chrom][j-totfragments[chrom-chrom_start]],hic[i][j]);
- 
-}
-}
-}
+/*if(strcasecmp(fourCVIEW,"no")!=0){
+fprintf(fout3b,"%d\t%d\t%d\t%d\t%f\n",store2[i],enzyme[store2[i]][grid(store2[i],store[i]+1,rf,enzyme)],chrom,enzyme[chrom][j-totfragments[chrom-chrom_start]],hic[i][j]);
+}*/
  }
-  
+ }
+ }
+
+    
 fclose(fout);
 fclose(fout2b);
 fclose(fout3b);
 fclose(fout4);
 fclose(fout4b);
- 
   }
+fclose(fouthic);
 
  FILE *fout5 = fopen (concat(concat(concat(fileout2,"/self_vf_it_"),itera),""), "a+");
  FILE *fout5b = fopen (concat(concat(concat(fileout2,"/cself_vf_it_"),itera),""), "a+");
@@ -1059,16 +1111,10 @@ fclose(fout4b);
 
  for(j=0;j<900;j++){
  for(i=0;i<40;i++){
-   fprintf(fout5,"%f\t",histobs[i][j]);
-   fprintf(fout6,"%f\t",histobs1[i][j]);
-   fprintf(fout7,"%f\t",histobs2[i][j]);
    normahist[i]+=histobs[i][j];
    normahist1[i]+=histobs1[i][j];
    normahist2[i]+=histobs2[i][j];
 }
-   fprintf(fout5,"\n"); 
-   fprintf(fout6,"\n"); 
-   fprintf(fout7,"\n");
 }
 
 for(i=0;i<40;i++){
@@ -1080,12 +1126,12 @@ for(j=1;j<900;j++){
    cumhist[i][j]=cumhist[i][j-1]+histobs[i][j]/normahist[i];
    cumhist1[i][j]=cumhist1[i][j-1]+histobs1[i][j]/normahist1[i];
    cumhist2[i][j]=cumhist2[i][j-1]+histobs2[i][j]/normahist2[i];
+
 tmpo=(double)(j);
 tmp=pow(2,((double)(i)/3));
-if(gsl_cdf_poisson_Q (tmpo,tmp)< FDR*(1.-cumhist[i][j])&&flag==0){threshold[i]=j;flag=1;}
-if(gsl_cdf_poisson_Q (tmpo,tmp)< FDR*(1.-cumhist1[i][j])&&flag1==0){threshold1[i]=j;flag1=1;}
-if(gsl_cdf_poisson_Q (tmpo,tmp)< FDR*(1.-cumhist2[i][j])&&flag2==0){threshold2[i]=j;flag2=1;}
-
+if(gsl_cdf_poisson_Q (j,tmp)< FDR*(1.-cumhist[i][j])&&flag==0){threshold[i]=j;flag=1;}
+if(gsl_cdf_poisson_Q (j,tmp)< FDR*(1.-cumhist1[i][j])&&flag1==0){threshold1[i]=j;flag1=1;}
+if(gsl_cdf_poisson_Q (j,tmp)< FDR*(1.-cumhist2[i][j])&&flag2==0){threshold2[i]=j;flag2=1;}
 }
 }
 
@@ -1093,10 +1139,18 @@ if(gsl_cdf_poisson_Q (tmpo,tmp)< FDR*(1.-cumhist2[i][j])&&flag2==0){threshold2[i
  for(i=0;i<40;i++){
   tmpo=(double)(j);
   tmp=pow(2,((double)(i)/3));
-  fprintf(fout5b,"%f\t%f\t",1.-cumhist[i][j],gsl_cdf_poisson_Q (tmpo,tmp));
-  fprintf(fout6b,"%f\t%f\t",1.-cumhist1[i][j],gsl_cdf_poisson_Q (tmpo,tmp));
-  fprintf(fout7b,"%f\t%f\t",1.-cumhist2[i][j],gsl_cdf_poisson_Q (tmpo,tmp));
+
+  fprintf(fout5,"%f\t%f\t",histobs[i][j]/normahist[i],gsl_ran_poisson_pdf(j,tmp));
+  fprintf(fout6,"%f\t%f\t",histobs1[i][j]/normahist1[i],gsl_ran_poisson_pdf(j,tmp));
+  fprintf(fout7,"%f\t%f\t",histobs2[i][j]/normahist2[i],gsl_ran_poisson_pdf(j,tmp));
+
+  fprintf(fout5b,"%f\t%f\t",1.-cumhist[i][j],gsl_cdf_poisson_Q (j,tmp));
+  fprintf(fout6b,"%f\t%f\t",1.-cumhist1[i][j],gsl_cdf_poisson_Q (j,tmp));
+  fprintf(fout7b,"%f\t%f\t",1.-cumhist2[i][j],gsl_cdf_poisson_Q (j,tmp));
 }
+  fprintf(fout5,"\n");
+  fprintf(fout6,"\n");
+  fprintf(fout7,"\n");
   fprintf(fout5b,"\n");
   fprintf(fout6b,"\n");
   fprintf(fout7b,"\n");
@@ -1115,7 +1169,7 @@ FILE *loops=fopen (concat(concat(concat(concat(concat(fileout2,"/self.donuts_it_
 
 while (!feof(loops))
 {
-fscanf(loops,"%d %d %d %d %d %d %f %f %d %f %d %d %d %f %f %f %f %e %e %e",&chrom1,&x1,&x2,&chrom2,&y1,&y2,&corrected,&obs,&distanceint,&expected,&bin_vf,&bin_donut,&bin_hf,&average1,&average2,&average3,&cover,&pval_vf,&pval_donut,&pval_hf);
+fscanf(loops,"%d %d %d %d %d %d %f %f %d %f %d %d %d %d %f %f %f %f %f %e %e %e %e",&chrom1,&x1,&x2,&chrom2,&y1,&y2,&corrected,&obs,&distanceint,&expected,&bin_vf,&bin_donut,&bin_hf,&bin_qdonut,&average1,&average2,&average3,&average4,&cover,&pval_vf,&pval_donut,&pval_hf,&pval_qdonut);
 
   tmpo=(double)(obs);
   tmp3=(int)(obs); 
@@ -1123,15 +1177,12 @@ fscanf(loops,"%d %d %d %d %d %d %f %f %d %f %d %d %d %f %f %f %f %e %e %e",&chro
   tmp1=pow(2,((double)(bin_donut)/3));
   tmp2=pow(2,((double)(bin_hf)/3));
 
-/*printf("%d %d %d %d %d %d %f %f %d %f %d %d %d %f %f %f %f %e %e %e\n",chrom1,x1,x2,chrom2,y1,y2,corrected,obs,distanceint,expected,bin_vf,bin_donut,bin_hf,average1,average2,average3,cover,pval_vf,pval_donut,pval_hf);*/
 
-if(1.-cumhist[bin_vf][tmp3]!=0){fdr=(double)(gsl_cdf_poisson_Q (tmpo,tmp)/(1.-cumhist[bin_vf][tmp3]));}else{fdr=1;}
-if(1.-cumhist1[bin_donut][tmp3]!=0){fdr1=(double)(gsl_cdf_poisson_Q (tmpo,tmp1)/(1.-cumhist1[bin_donut][tmp3]));}else{fdr1=1;}
-if(1.-cumhist2[bin_hf][tmp3]!=0){fdr2=(double)(gsl_cdf_poisson_Q (tmpo,tmp2)/(1.-cumhist2[bin_hf][tmp3]));}else{fdr2=1;}
+if(1.-cumhist[bin_vf][tmp3]!=0){fdr=(double)(gsl_cdf_poisson_Q (obs,tmp)/(1.-cumhist[bin_vf][tmp3]));}else{fdr=1;}
+if(1.-cumhist1[bin_donut][tmp3]!=0){fdr1=(double)(gsl_cdf_poisson_Q (obs,tmp1)/(1.-cumhist1[bin_donut][tmp3]));}else{fdr1=1;}
+if(1.-cumhist2[bin_hf][tmp3]!=0){fdr2=(double)(gsl_cdf_poisson_Q (obs,tmp2)/(1.-cumhist2[bin_hf][tmp3]));}else{fdr2=1;}
 
-/*printf("%f\t%f\t%f\t%e\t%e\t%e\t%e\t%e\n",tmpo,tmp1,average2,gsl_cdf_poisson_Q (tmpo,average2),gsl_cdf_poisson_Q (tmpo,tmp),pval_donut,(1.-cumhist[bin_vf][tmp3]),gsl_cdf_poisson_Q (tmpo,tmp)/(1.-cumhist[bin_vf][tmp3]));*/
-
-if(distanceint>=0){  fprintf(fout8,"%d,%d,%d\t%d,%d,%d\t%f\t%f\t%d\t%f\t%d\t%d\t%d\t%d\t%d\t%d\t%e\t%e\t%e\t%e\t%e\t%e\n",chrom1,x1,x2,chrom2,y1,y2,corrected,obs,distanceint,expected,bin_vf,bin_donut,bin_hf,threshold[bin_vf],threshold1[bin_donut],threshold2[bin_hf],pval_vf,pval_donut,pval_hf,fdr,fdr1,fdr2);}
+if(distanceint>=0){  fprintf(fout8,"%d,%d,%d\t%d,%d,%d\t%f\t%f\t%d\t%f\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%e\t%e\t%e\t%e\t%e\t%e\t%e\n",chrom1,x1,x2,chrom2,y1,y2,corrected,obs,distanceint,expected,bin_vf,bin_donut,bin_hf,bin_qdonut,threshold[bin_vf],threshold1[bin_donut],threshold2[bin_hf],pval_vf,pval_donut,pval_hf,pval_qdonut,fdr,fdr1,fdr2);}
 }
 
  fclose(loops);
