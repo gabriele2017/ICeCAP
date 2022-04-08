@@ -1,0 +1,12 @@
+here please add the mappability files. for each chromosome please generate the average self-mappability 
+values.
+
+for i in 2 3 4 5 .. M ; do
+
+/your_dir/reference_map/allSeqG.pl /your_dir/reference_map/chr$i.fa 75 > /your_dir/reference_map/chr$i.fastq
+/apps/well/bowtie2/2.2.4/bowtie2 --very-sensitive -x /your_dir/reference_bowtie/mm9/mm9 -U /your_dir/reference_map/chr$i.fastq -S /your_dir/reference_map/chr$i.sam 
+rm /your_dir/reference_map/chr$i.fastq
+/your_dir/reference_map/map.pl /your_dir/reference_map/chr$i.sam /your_dir/reference_map/chr 100 $i 36 /your_dir/reference_map/
+rm /your_dir/reference_map/chr$i.sam
+done
+~         
