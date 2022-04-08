@@ -1,0 +1,2 @@
+Here please add all fasta files for each chromosome (e.g. hg19: chr1.fa -chr22.fa + chrXYM.fa)
+as well as the bowtie2 indexes generated from the *same* reference genome (e.g. hg19.2.bt2, hg19.rev.2.bt2, etc. you should have six bt2 files in total)
