@@ -1,0 +1,1 @@
+cat file.fastq | paste - - - - | sort -k1,1 -t " " | tr "\t" "\n" > file_sorted.fastq
