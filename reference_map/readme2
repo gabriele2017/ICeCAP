@@ -1,6 +1,36 @@
-here please add the mappability files. for each chromosome please generate the average self-mappability 
-values.
 
+
+
+
+
+here please add the mappability files. for each chromosome please generate the average self-mappability 
+values at 100bp resolution. So for mm10, a mapability file would look like:
+
+
+cat ../mappability_chr1
+
+chr1	29999	0.100000
+chr1	30000	1.000000
+chr1	30001	1.000000
+chr1	30002	1.000000
+chr1	30003	1.000000
+chr1	30004	1.000000
+chr1	30005	1.000000
+.
+.
+
+chr1	1971944	1.000000
+chr1	1971945	0.870000
+chr1	1971946	0.500000
+chr1	1971947	1.000000
+chr1	1971948	1.000000
+chr1	1971949	1.000000
+chr1	1971950	1.000000
+chr1	1971951	0.670000
+chr1	1971952	1.000000
+chr1	1971953	0.580000
+
+To generate these files please do the self-mapping per chromosome using the following guidelines:
 for i in 2 3 4 5 .. M ; do
 
 /your_dir/reference_map/allSeqG.pl /your_dir/reference_map/chr$i.fa 75 > /your_dir/reference_map/chr$i.fastq
@@ -10,5 +40,4 @@ rm /your_dir/reference_map/chr$i.fastq
 rm /your_dir/reference_map/chr$i.sam
 done
 ~         
-
-you can generate the mapability files with the scripts above.
+ 
