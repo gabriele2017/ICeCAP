@@ -10,3 +10,5 @@ rm /your_dir/reference_map/chr$i.fastq
 rm /your_dir/reference_map/chr$i.sam
 done
 ~         
+
+you can generate the mapability files with the scripts above.
