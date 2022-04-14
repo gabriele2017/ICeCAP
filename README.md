@@ -1,6 +1,6 @@
 ICeCAP is written in ANSI-C and provides flexible, multi-scale analysis of $BOTH$ Hi-C and Capture-C/Capture-Hi-C data. Dynamical, pointer based memory allocation and mapping of sub-genomic regions allow interaction maps to be resolved computationally at single restriction fragment, "meta-fragment" or uniform resolution.
 The output files can be converted to $hic$ and $cool$ format with the $Juicer$ and $Hi-Glass$ tools.
-ICeCAP has been developed at the Institute of Cancer Research and the Wellcome Centre for Human Genetics by Gabriele Migliorini.
+
 
 GNU GPL v3 license applies.\\
 
