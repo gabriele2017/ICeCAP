@@ -20,7 +20,7 @@
 
 #define PACKAGE "ICECap"
 #define VERSION "0.01"
-#define CHROMOSOMES 22
+#define CHROMOSOMES 25
 #define WIN_SHIFT1 1
 #define RESOLUTION 1000
 
@@ -245,7 +245,7 @@ number_for_key(char *key)
 	  }
 sprintf(zom,"%d",SCALE);
 sprintf(wind,"%d",window);
-sprintf(stamp,concat(concat(concat("/NewAnalysis_Z",zom),"_W"),wind)); 
+sprintf(stamp,concat(concat(concat("/Analysis_Z",zom),"_W"),wind)); 
     
 
  init(lane,folder,folderN,PATHBOWTIE,chrom_start,chrom_end,stamp,stamp2,stats);
@@ -335,7 +335,7 @@ printf("\n %d Chromosomes will be considered \n",chrom_end);
  
 if(strlen(folderN)==0){folderN=folder; }else{ sprintf(zom,"%d",SCALE);
 
-      sprintf(stamp,concat(concat(concat("/NewAnalysis_Z",zom),"_W"),wind));
+      sprintf(stamp,concat(concat(concat("/Analysis_Z",zom),"_W"),wind));
       mkdir(concat(concat(folder,lane),stamp),0777); mkdir(concat(concat(concat(concat(folder,lane),stamp),"/weights"),stamp2),0777);
       mkdir(concat(concat(concat(concat(concat(folder,lane),stamp),"/"),stats),stamp2),0777);
       mkdir(concat(concat(concat(concat(concat(concat(folder,lane),stamp),"/"),stats),stamp2),"/fdr"),0777);
@@ -691,8 +691,10 @@ fclose(fout6);
 FILE *tads= fopen(concat(concat(concat(concat(outdir,lane),"_Z"),zom),".tad"), "w+");
 FILE *peakY = fopen(concat(concat(concat(concat(outdir,lane),"_Z"),zom),".pkY"), "w+");
 FILE *peakY2 = fopen(concat(concat(concat(concat(outdir,lane),"_Z"),zom),".cool"), "w+");
+
 FILE *gff;
- FILE *peakC; 
+FILE *peakC; 
+
 FILE *wig= fopen(concat(concat(concat(concat(outdir,lane),"_Z"),zom),".wig"), "w+");
 
 pchic=0;
@@ -708,7 +710,8 @@ sprintf(sbait,"%d",i);
 if(strcasecmp(stringarray[i],"")!=0){sprintf(sbait,"%s",stringarray[i]);}
 
 FILE *peakC = fopen(concat(concat(concat(concat(concat(concat(outdir2,lane),"_BAIT_"),sbait),"_Z"),zom),".pkC"), "w+");
-FILE *gff = fopen(concat(concat(concat(concat(concat(concat(outdir2,lane),"_BAIT_"),sbait),"_Z"),zom),".gff"), "w+");
+FILE *gff = fopen(concat(concat(concat(concat(concat(outdir2,lane),"_BAIT_"),sbait),"_Z1"),".gff"), "w+");
+
 
 if(pchic==1){
 }else{
@@ -750,7 +753,7 @@ fprintf(tads,"%d\t",hic[i][j]);
 fdist=100000000;}
 if(hic[i][j]>0){
 if(j>=i){fprintf(peakY2,"%d\t%d\t%d\n",i,j,hic[i][j]);}
-printf("BOH: %d\t%d\t%d\t%d\n",i,j,chrombait[i],chrombait[j]);
+/* printf("BOH: %d\t%d\t%d\t%d\n",i,j,chrombait[i],chrombait[j]); */
 if(chrombait[i]!=chromgrid[j]){
 fprintf(peakY,"%d\t%d\t%d\t%f\t%f\t%f\n",totfragments[chrombait[i]-1]+cgrid(chrombait[i],baitpoints[chrombait[i]][i-totbaits[chrombait[i]-1]]+(1-pchic)*RESOLUTION,gp,gridpoints),j,hic[i][j],fdist,1,1);
 }else{
@@ -762,6 +765,9 @@ fprintf(peakY,"%d\t%d\t%d\t%f\t%f\t%f\n",totfragments[chrombait[i]-1]+cgrid(chro
 }
 }
 }
+}
+if(pchic==1){
+if(hic[i][j]!=0){fprintf(gff,"%s\tICE\t%s\t%d\t%d\t%d\t+\t0\t.\n",record[chromgrid[j]].name_chromosome,sbait,gridpoints[chromgrid[j]][j-(totfragments[chromgrid[j]-1]+1)],gridpoints[chromgrid[j]][j-(totfragments[chromgrid[j]-1])],hic[i][j]);}
 }
 }
 
@@ -818,7 +824,7 @@ sprintf(command,"sed -i 's/chr//' %s",concat(concat(outdir,lane),".tsv"));
 system(command);
 printf("%s\n",command);
 
-sprintf(command,"R --vanilla < %sPEAKY.R --args %s %s %s %s %d ",folderrefC,outdir,concat(concat(concat(concat(outdir,lane),"_Z"),zom),".pkY"),concat(outdir,"/bins/"),concat(concat(outdir,lane),".tsv"),window);
+sprintf(command,"R --no-save < %sPEAKY.R --args %s %s %s %s %d ",folderrefC,outdir,concat(concat(concat(concat(outdir,lane),"_Z"),zom),".pkY"),concat(outdir,"/bins/"),concat(concat(outdir,lane),".tsv"),window);
 printf("%s\n",command);
 system(command);
 
