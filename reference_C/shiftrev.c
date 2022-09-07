@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #define LINE_MAX 0x4000
 
@@ -76,9 +77,9 @@ if(strncmp(vflag[i],"16",2)==0){
         while(*c!=0)
             {
             char* p2;
-                if(!isdigit(*c)) {       fprintf(stderr,"bad cigar string: %s\n",*cigar); return 0; }
+                if(!isdigit(*c)) {       fprintf(stderr,"bad cigar string: %s\n",cigar); return 0; }
             int n=strtol(c,&p2,10);
-                if(n<1){                 fprintf(stderr,"bad cigar string: %s\n",*cigar); return 0; }
+                if(n<1){                 fprintf(stderr,"bad cigar string: %s\n",cigar); return 0; }
                 switch(*p2)
                 {
                 case 'M':{ while(n>0) { icount++; --n; } break; }
@@ -97,9 +98,9 @@ if(strncmp(vflag[j],"16",2)==0){
         while(*c!=0)
             {
             char* p2;
-                if(!isdigit(*c)) {       fprintf(stderr,"bad cigar string: %s\n",*cigar); return 0; }
+                if(!isdigit(*c)) {       fprintf(stderr,"bad cigar string: %s\n",cigar); return 0; }
             int n=strtol(c,&p2,10);
-                if(n<1){                fprintf(stderr,"bad cigar string: %s\n",*cigar); return 0; }
+                if(n<1){                fprintf(stderr,"bad cigar string: %s\n",cigar); return 0; }
                 switch(*p2)
                 {
                 case 'M':{ while(n>0) { jcount++; --n; } break; }
